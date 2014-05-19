@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- include dependencies -->
+		<script type='text/javascript' src='lib/xapicollection.min.js'></script>
+		<script type='text/javascript' src='lib/xapidashboard.min.js'></script>
+		<script type='text/javascript' src='gen-lrs-data.js'></script>
+		<link rel='stylesheet' href='lib/nv.d3.css'></script>
+		
+		<!-- include a basic style for laying out the graphs -->
+		<style>
+			.container {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				align-items: center;
+			}
+			.graph {
+				width: 500px;
+				height: 300px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class='container'>
+
+			<!-- graph for the first question: mix, max, and average of tests -->
+			<div class='graph' id='testScores'>
+				<svg></svg>
+			</div>
+
+			<!-- graph for the second question: student count per letter grade -->
+			<div class='graph' id='scoreBrackets'>
+				<svg></svg>
+			</div>
+
+			<!-- graph for the third question: scores for individual students -->
+			<div class='graph' id='studentScores'>
+				<svg></svg>
+			</div>
+
+		</div>
+
+		<!-- pushed to the end of body for quicker load times -->
+		<script>
+
+			
+			var dash = new ADL.XAPIDashboard();
+
+			// do this to fetch live data from an LRS
+			/*ADL.XAPIWrapper.changeConfig({
+				'endpoint': 'https://lrs.adlnet.gov/xAPI/'
+			});
+			dash.fetchAllStatements({}, function(){*/
+
+			// do this to use the pre-loaded handwaved LRS data
+			(function(cb){dash.addStatements(window.statements);cb();})(function(){
+
+				/*
+				 * Your chart code goes here!
+				 */
+				
+
+			});
+
+
+
+		</script>
+	</body>
+</html>
