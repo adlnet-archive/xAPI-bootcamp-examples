@@ -76,44 +76,74 @@
 
 				// create the student scores chart
 				dash.studentScores = dash.createBarChart({
+
+					// in the appropriate container
 					container: '#studentScores svg',
+
+					// using only the data from the clicked parts of the ancestor charts
 					pre: function(data,evt)
 					{
 						var filter = '';
 						var title = 'Student Scores';
 						var parentEvent = dash.scoreBrackets.event;
 
-						if(parentEvent){
+						// if a test was clicked in grandparent
+						if(parentEvent)
+						{
+							// update chart title
 							var testName = /([^\/]+?)(\d?)$/.exec(parentEvent.in);
 							testName = testName[1].charAt(0).toUpperCase() + testName[1].slice(1) + (testName[2]?' '+testName[2]:'');
 							title += ' For '+testName;
+
+							// only use data from that test
 							filter += ' and object.id = "'+parentEvent.in+'"';
 						}
-						if(evt){
+						// if a score range was clicked
+						if(evt)
+						{
+							// update chart title
 							var range = evt.in.split('-');
 							title += ' Between '+range[0]+' and '+range[1];
+
+							// only use data from that column
 							filter += ' and result.score.raw >= '+range[0]+' and result.score.raw < '+range[1];
-							console.log(filter);
 						}
+						// apply title and filter changes
 						document.querySelector('#studentScores h2').innerHTML = title;
 						return data.where('result.score.raw != null'+filter);
 					},
+
+					// put student names on x-axis
 					groupBy: 'actor.name',
+
+					// put their scores on the y-axis
 					aggregate: ADL.select('result.score.raw'),
+
+					// sort by score and limit to 15 students on the chart
 					post: function(data){
 						return (new ADL.CollectionSync(data))
 							.orderBy('out','desc')
 							.slice(0,15)
 							.contents;
 					},
-					customize: function(nvd3chart){
+
+					// tilt the x-axis labels and scale y-axis down to clicked range
+					customize: function(nvd3chart, evt){
 						nvd3chart.xAxis.rotateLabels(45);
+						if(evt){
+							var parts = evt.in.split('-').map(parseInt);
+							nvd3chart.forceY(parts);
+						}
 					}
 				});
 
 				// create the class scores pie chart
 				dash.scoreBracketsPie = dash.createPieChart({
+
+					// in the appropriate container
 					container: '#scoreBrackets svg#pie',
+
+					// selecting only the clicked-on test, or all tests if no click event
 					pre: function(data, evt){
 						var filter = '';
 						if(evt){
@@ -121,12 +151,22 @@
 						}
 						return data.where('result.score.raw != null'+filter);
 					},
+
+					// put the raw scores on the arcs
 					groupBy: 'result.score.raw',
+
+					// in groups of 10, from 50 to 100
 					range: {start: 50, end: 100, increment: 10},
+
+					// put the size of the groups on the radius
 					aggregate: ADL.count(),
+
+					// and hide the redundant legend
 					customize: function(nvd3chart){
 						nvd3chart.showLegend(false);
 					},
+
+					// if it's clicked on, pass click data to the studentScores chart
 					child: dash.studentScores
 				});
 
@@ -136,19 +176,30 @@
 					// in the appropriate container
 					container: '#scoreBrackets svg#bar',
 
-					// selecting only the given test, or all tests if omitted
-					pre: function(data, evt){
+					// selecting only the clicked-on test, or all tests if no click event
+					pre: function(data, evt)
+					{
 						var filter = '';
-						if(evt){
+
+						// if the parent chart was clicked on
+						if(evt)
+						{
+							// update the chart title
 							var testName = /([^\/]+?)(\d?)$/.exec(evt.in);
 							testName = testName[1].charAt(0).toUpperCase() + testName[1].slice(1) + (testName[2]?' '+testName[2]:'');
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For '+testName;
+
+							// filter data down to clicked column
 							filter = ' and object.id = "'+evt.in+'"';
 						}
+						// otherwise draw generic title
 						else {
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For All Tests';
 						}
+						// update the child chart with new click data
 						dash.studentScores.draw();
+
+						// apply filter
 						return data.where('result.score.raw != null'+filter);
 					},
 
