@@ -19,7 +19,7 @@
 				justify-content: center;
 				align-items: center;
 			}
-			.graph {
+			.graph svg {
 				width: 800px;
 				height: 400px;
 			}
@@ -39,13 +39,11 @@
 			<div class='graph' id='scoreBrackets'>
 				<h2>Class Scores For All Tests</h2>
 				<p>(<a href='javascript:;' onclick='resetScoreBrackets()'>reset</a>)</p>
-				<svg></svg>
+				<div class='container'>
+					<svg id='bar'></svg>
+				</div>
 			</div>
 
-			<!-- graph for the third question: scores for individual students -->
-			<div class='graph' id='studentScores'>
-				<svg></svg>
-			</div>
 
 		</div>
 
@@ -69,22 +67,31 @@
 				dash.scoreBrackets = dash.createBarChart({
 
 					// in the appropriate container
-					container: '#scoreBrackets svg',
+					container: '#scoreBrackets svg#bar',
 
-					// selecting only the given test, or all tests if omitted
-					pre: function(data, evt){
-						var filter;
-						if(evt){
+					// selecting only the clicked-on test, or all tests if no click event
+					pre: function(data, evt)
+					{
+						var filter = '';
+
+						// if the parent chart was clicked on
+						if(evt)
+						{
+							// update the chart title
 							var testName = /([^\/]+?)(\d?)$/.exec(evt.in);
 							testName = testName[1].charAt(0).toUpperCase() + testName[1].slice(1) + (testName[2]?' '+testName[2]:'');
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For '+testName;
-							filter = '"'+evt.in+'"';
+
+							// filter data down to clicked column
+							filter = ' and object.id = "'+evt.in+'"';
 						}
+						// otherwise draw generic title
 						else {
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For All Tests';
-							filter = '/.*/';
 						}
-						return data.where('result.score.raw != null and object.id = '+filter);
+
+						// apply filter
+						return data.where('result.score.raw != null'+filter);
 					},
 
 					// put the raw score on the x-axis

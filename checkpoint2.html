@@ -9,7 +9,7 @@
 		
 		<!-- include a basic style for laying out the graphs -->
 		<style>
-			h2 {
+			h2,p {
 				text-align: center;
 			}
 			.container {
@@ -19,7 +19,7 @@
 				justify-content: center;
 				align-items: center;
 			}
-			.graph {
+			.graph svg {
 				width: 800px;
 				height: 400px;
 			}
@@ -35,22 +35,12 @@
 				<svg></svg>
 			</div>
 
-			<!-- graph for the second question: student count per letter grade -->
-			<div class='graph' id='scoreBrackets'>
-				<svg></svg>
-			</div>
-
-			<!-- graph for the third question: scores for individual students -->
-			<div class='graph' id='studentScores'>
-				<svg></svg>
-			</div>
 
 		</div>
 
 		<!-- pushed to the end of body for quicker load times -->
 		<script>
 
-			
 			var dash = new ADL.XAPIDashboard();
 
 			// do this to fetch live data from an LRS
@@ -88,8 +78,7 @@
 					}
 				});
 
-				testScores.draw();
-
+				dash.testScores.draw();
 			});
 
 

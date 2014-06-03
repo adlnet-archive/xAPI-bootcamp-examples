@@ -68,22 +68,31 @@
 			// do this to use the pre-loaded handwaved LRS data
 			(function(cb){dash.addStatements(window.statements);cb();})(function(){
 
-				// create the student scores chart
+				// create the class scores pie chart
 				dash.scoreBracketsPie = dash.createPieChart({
+
+					// in the appropriate container
 					container: '#scoreBrackets svg#pie',
+
+					// selecting only the clicked-on test, or all tests if no click event
 					pre: function(data, evt){
-						var filter;
+						var filter = '';
 						if(evt){
-							filter = '"'+evt.in+'"';
+							filter = ' and object.id = "'+evt.in+'"';
 						}
-						else {
-							filter = '/.*/';
-						}
-						return data.where('result.score.raw != null and object.id = '+filter);
+						return data.where('result.score.raw != null'+filter);
 					},
+
+					// put the raw scores on the arcs
 					groupBy: 'result.score.raw',
+
+					// in groups of 10, from 50 to 100
 					range: {start: 50, end: 100, increment: 10},
+
+					// put the size of the groups on the radius
 					aggregate: ADL.count(),
+
+					// and hide the redundant legend
 					customize: function(nvd3chart){
 						nvd3chart.showLegend(false);
 					}
@@ -95,20 +104,29 @@
 					// in the appropriate container
 					container: '#scoreBrackets svg#bar',
 
-					// selecting only the given test, or all tests if omitted
-					pre: function(data, evt){
-						var filter;
-						if(evt){
+					// selecting only the clicked-on test, or all tests if no click event
+					pre: function(data, evt)
+					{
+						var filter = '';
+
+						// if the parent chart was clicked on
+						if(evt)
+						{
+							// update the chart title
 							var testName = /([^\/]+?)(\d?)$/.exec(evt.in);
 							testName = testName[1].charAt(0).toUpperCase() + testName[1].slice(1) + (testName[2]?' '+testName[2]:'');
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For '+testName;
-							filter = '"'+evt.in+'"';
+
+							// filter data down to clicked column
+							filter = ' and object.id = "'+evt.in+'"';
 						}
+						// otherwise draw generic title
 						else {
 							document.querySelector('#scoreBrackets h2').innerHTML = 'Class Scores For All Tests';
-							filter = '/.*/';
 						}
-						return data.where('result.score.raw != null and object.id = '+filter);
+
+						// apply filter
+						return data.where('result.score.raw != null'+filter);
 					},
 
 					// put the raw score on the x-axis
