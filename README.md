@@ -10,4 +10,5 @@ Related projects:
 * [xAPI Dashboard](https://github.com/adlnet/xAPI-Dashboard)
 
 These files are covered under the Apache 2 license, which means you are welcome to modify
-or reuse them however you see fit. See the [license clause](LICENSE) for details.
+or reuse them however you see fit, as long as you don't claim copyright or blame us if it
+kills your system. See the [license clause](LICENSE) for details.
